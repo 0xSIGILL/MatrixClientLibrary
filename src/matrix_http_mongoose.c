@@ -26,10 +26,9 @@ static void
 MatrixHttpCallback(
     struct mg_connection *c,
     int ev,
-    void *ev_data,
-    void *fn_data)
+    void *ev_data)
 {
-    MatrixHttpConnection * conn = (MatrixHttpConnection *)fn_data;
+    MatrixHttpConnection * conn = (MatrixHttpConnection *)c->fn_data;
 
     if (ev == MG_EV_CONNECT)
     {
@@ -39,23 +38,19 @@ MatrixHttpCallback(
         if (mg_url_is_ssl(conn->host))
         {
             static struct mg_tls_opts opts;
-            opts.srvname = host;
+            opts.name = host;
             mg_tls_init(c, &opts);
         }
 
         conn->connection = c;
         conn->connected = true;
     }
-    if (ev == MG_EV_HTTP_CHUNK)
-    {
-        
-    }
     if (ev == MG_EV_HTTP_MSG)
     {
         // Response
         struct mg_http_message *hm = (struct mg_http_message *)ev_data;
         
-        memcpy(conn->data, hm->body.ptr, hm->body.len);
+        memcpy(conn->data, hm->body.buf, hm->body.len);
         
         conn->data[hm->body.len] = '\0';
         conn->dataLen = hm->body.len;
@@ -146,7 +141,7 @@ MatrixHttpGet(
         "%s"
         "\r\n",
         url,
-        host.len, host.ptr,
+        host.len, host.buf,
         authorizationHeader);
 
     hc->data = outResponseBuffer;
@@ -190,7 +185,7 @@ MatrixHttpPost(
             "%s"
             "\r\n",
             url,
-            (int)host.len, host.ptr,
+            (int)host.len, host.buf,
             authorizationHeader,
             (int)strlen(requestBuffer),
             requestBuffer);
@@ -236,7 +231,7 @@ MatrixHttpPut(
             "%s"
             "\r\n",
             url,
-            (int)host.len, host.ptr,
+            (int)host.len, host.buf,
             authorizationHeader,
             (int)strlen(requestBuffer),
             requestBuffer);
