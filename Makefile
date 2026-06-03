@@ -34,7 +34,7 @@ olm:
 
 mongoose:
 	cd out && \
-	$(CC) -c ../ext/mongoose/mongoose.c -I ../ext/mongoose/ -DMG_ENABLE_OPENSSL=1
+	$(CC) -c ../ext/mongoose/mongoose.c -I ../ext/mongoose/ -DMG_TLS=MG_TLS_BUILTIN
 
 mjson:
 	cd out && \
